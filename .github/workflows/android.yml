@@ -1,10 +1,10 @@
-
 name: Build GoalPredict APK
 
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build:
@@ -14,16 +14,10 @@ jobs:
       - name: Get source code
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
 
       - name: Install dependencies
         run: npm install
@@ -32,23 +26,24 @@ jobs:
         run: npm run build
 
       - name: Install Capacitor
-        run: npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
 
       - name: Configure Capacitor
         run: |
-          cat > capacitor.config.json <<'EOF'
-          {
-            "appId": "com.goalpredict.app",
-            "appName": "GoalPredict",
-            "webDir": "dist"
-          }
-          EOF
+          npx cap init GoalPredict com.goalpredict.app --web-dir=dist
 
       - name: Add Android platform
         run: npx cap add android
 
       - name: Sync Android project
         run: npx cap sync android
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
 
       - name: Build APK
         run: |
